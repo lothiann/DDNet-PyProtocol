@@ -581,8 +581,14 @@ class Client:
         self._interpret(new_snap)
 
     def _interpret(self, snap: Snapshot) -> None:
-        """Merge snapshot items into the player view."""
-        players: dict[int, PlayerState] = self.game.players
+        """Build the player view from the CURRENT snapshot.
+
+        A fresh dict per snapshot: the decoded delta carries every live item
+        (unchanged items are carried over by unpack), so players who left are
+        dropped instead of lingering as ghosts with stale/empty names.
+        """
+        players: dict[int, PlayerState] = {}
+        self.game.players = players
 
         # uuid items: an EX item (type 0, id >= 0x4000) carries the uuid,
         # the real item with type >= 0x4000 carries the data
