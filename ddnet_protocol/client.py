@@ -95,6 +95,9 @@ class PlayerState:
     auth_level: int = 0
     character: bool = False  # has a CHARACTER object in the current snapshot
     has_playerinfo: bool = False  # server-snapped a PLAYERINFO for this slot
+    use_custom_color: bool = False
+    color_body: int = 0  # packed HSL (h<<16 | s<<8 | l), DDNet format
+    color_feet: int = 0
 
     @property
     def in_game(self) -> bool:
@@ -623,6 +626,9 @@ class Client:
                     player.clan = self._ints_to_str(ints[4:7])
                     player.country = ints[7]
                     player.skin = self._ints_to_str(ints[8:14])
+                    player.use_custom_color = bool(ints[14])
+                    player.color_body = ints[15]
+                    player.color_feet = ints[16]
             elif symbol == "NETOBJTYPE_PLAYERINFO":
                 if len(ints) >= 5:
                     player = players.setdefault(item_id, PlayerState())
