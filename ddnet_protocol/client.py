@@ -94,6 +94,12 @@ class PlayerState:
     spec: bool = False
     auth_level: int = 0
     character: bool = False  # has a CHARACTER object in the current snapshot
+    has_playerinfo: bool = False  # server-snapped a PLAYERINFO for this slot
+
+    @property
+    def in_game(self) -> bool:
+        """False for the server's fake " " client (chat relay, no PLAYERINFO)."""
+        return self.has_playerinfo
 
 
 @dataclass
@@ -620,6 +626,7 @@ class Client:
             elif symbol == "NETOBJTYPE_PLAYERINFO":
                 if len(ints) >= 5:
                     player = players.setdefault(item_id, PlayerState())
+                    player.has_playerinfo = True
                     player.local = bool(ints[0])
                     player.team = ints[2]
                     player.score = ints[3]
